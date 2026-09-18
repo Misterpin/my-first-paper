@@ -1,44 +1,38 @@
-# Title
-
-<!-- Change `kisnikser/m1p-template` to `intsystems/your-repository`-->
-[![License](https://badgen.net/github/license/kisnikser/m1p-template?color=green)](https://github.com/kisnikser/m1p-template/blob/main/LICENSE)
-[![GitHub Contributors](https://img.shields.io/github/contributors/kisnikser/m1p-template)](https://github.com/kisnikser/m1p-template/graphs/contributors)
-[![GitHub Issues](https://img.shields.io/github/issues-closed/kisnikser/m1p-template.svg?color=0088ff)](https://github.com/kisnikser/m1p-template/issues)
-[![GitHub Pull Requests](https://img.shields.io/github/issues-pr-closed/kisnikser/m1p-template.svg?color=7f29d6)](https://github.com/kisnikser/m1p-template/pulls)
+# Программная система ЭЭГ-спеллера с интегрированной большой языковой моделью: разработка, оценка эффективности и методология бенчмарка
 
 <table>
     <tr>
-        <td align="left"> <b> Author </b> </td>
-        <td> Name Surname </td>
+        <td align="left"> <b> Автор </b> </td>
+        <td> Барабанщиков М. А. </td>
     </tr>
     <tr>
-        <td align="left"> <b> Consultant </b> </td>
-        <td> Name Surname, PhD/DSc </td>
+        <td align="left"> <b> Консультант </b> </td>
+        <td> Майсурадзе А. И. </td>
     </tr>
     <tr>
-        <td align="left"> <b> Advisor </b> </td>
-        <td> Name Surname, PhD/DSc </td>
+        <td align="left"> <b> Научный руководитель </b> </td>
+        <td> Майсурадзе А. И. </td>
     </tr>
 </table>
 
-## Assets
+## Материалы
 
-- [LinkReview](LINKREVIEW.md)
-- [Code](code)
-- [Paper](paper/main.pdf)
-- [Slides](slides/main.pdf)
+- [Обзор литературы](LINKREVIEW.md)
+- [Код](code)
+- [Статья](paper/main.pdf)
+- [Слайды](slides/main.pdf)
 
-## Abstract
+## Аннотация
 
-TODO
+-
 
-## Citation
+## Цитирование
 
-If you find our work helpful, please cite us.
+Если вы находите нашу работу полезной, пожалуйста, ссылайтесь на неё.
 ```BibTeX
 @article{citekey,
-    title={Title},
-    author={Name Surname, Name Surname (consultant), Name Surname (advisor)},
+    title={Название},
+    author={Барабанщиков М. А., Майсурадзе А. И.},
     year={2025}
 }
 ```
