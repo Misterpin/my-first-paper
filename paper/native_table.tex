@@ -1,0 +1,10 @@
+\begin{table}[h]
+\caption{Качество языкового прогноза, ошибка последовательного ввода и задержка расчёта распределения (медиана/95-й перцентиль, мс).}
+\small\centering
+\begin{tabular}{@{}lrrrr@{}}\toprule
+Источник & BPC $\downarrow$ & Top-1, \% $\uparrow$ & CER, \% $\downarrow$ & Медиана/p95 \\\midrule
+Без языка & 5,13 & -- & 19,10 & -- \\
+Char4 & 2,82 & 40,97 & 12,67 & 0,02/0,03 \\
+KenLM & 2,23 & 52,63 & 11,89 & 0,07/56,57 \\
+\bottomrule\end{tabular}
+\end{table}
