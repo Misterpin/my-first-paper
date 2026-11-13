@@ -1,30 +1,161 @@
-\documentclass[aspectratio=169]{beamer}
-\usepackage{fontspec}
-\setsansfont{NotoSans}[Path=../fonts/,Extension=.ttf,UprightFont=*-Regular,BoldFont=*-Bold,ItalicFont=*-Italic]
+% Overleaf: main.tex, compiler pdfLaTeX. Exactly three slides.
+% Editable chart values are stored in figures/*.csv.
+\documentclass[10pt,aspectratio=169]{beamer}
+\usepackage[T2A]{fontenc}
+\usepackage[utf8]{inputenc}
 \usepackage[russian]{babel}
-\usepackage{graphicx,amsmath}
+\usepackage{amsmath,booktabs,array}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+\definecolor{ink}{HTML}{172B3A}
+\definecolor{muted}{HTML}{536572}
+\definecolor{blue}{HTML}{2865B3}
+\definecolor{green}{HTML}{008875}
+\definecolor{gray}{HTML}{7A8793}
+\definecolor{grid}{HTML}{E1E6EB}
+\setbeamercolor{normal text}{fg=ink,bg=white}
+\setbeamercolor{frametitle}{fg=ink,bg=white}
+\setbeamerfont{frametitle}{size=\fontsize{15}{17}\selectfont,series=\bfseries}
+\setbeamersize{text margin left=6mm,text margin right=6mm}
 \setbeamertemplate{navigation symbols}{}
-\setbeamertemplate{footline}{}
-\setbeamercolor{frametitle}{fg=black,bg=white}
-\setbeamercolor{normal text}{fg=black,bg=white}
-\setbeamersize{text margin left=.55cm,text margin right=.55cm}
-\input{../paper/native_values}
+\setbeamertemplate{footline}{\hfill\color{muted}\fontsize{6.5}{7}\selectfont\insertframenumber/3\hspace{6mm}\vspace{2mm}}
+\setbeameroption{hide notes}
+\newcommand{\subtext}[1]{{\color{muted}\fontsize{8.4}{10}\selectfont #1\par}}
+\newcommand{\smalltext}[1]{{\color{muted}\fontsize{7.3}{9}\selectfont #1\par}}
+\newcommand{\takeaway}[1]{{\color{green}\bfseries\fontsize{11}{13}\selectfont #1\par}}
+\pgfplotsset{deckaxis/.style={
+ width=6.65cm,height=3.55cm,
+ ymin=0,ymax=103,ytick={0,20,40,60,80,100},
+ axis lines=left,axis line style={grid},tick style={draw=none},
+ ymajorgrids=true,grid style={grid},
+ tick label style={font=\fontsize{7}{8}\selectfont,text=muted},
+ label style={font=\fontsize{7}{8}\selectfont,text=muted},
+ title style={font=\fontsize{9}{10}\selectfont\bfseries,text=ink},
+ legend style={draw=none,font=\fontsize{7}{8}\selectfont,at={(0.5,-0.27)},anchor=north,legend columns=3,/tikz/every even column/.append style={column sep=3pt}},
+ xlabel={},scaled ticks=false,
+ every axis plot/.append style={line width=1pt,mark size=1.6pt}
+}}
+\newcommand{\curves}[1]{%
+ \addplot[gray,mark=*] table[x=cycles,y=uniform,col sep=comma]{figures/#1.csv};
+ \addlegendentry{Без языка}
+ \addplot[blue,mark=square*] table[x=cycles,y=char4,col sep=comma]{figures/#1.csv};
+ \addlegendentry{Char4}
+ \addplot[green,mark=triangle*] table[x=cycles,y=kenlm,col sep=comma]{figures/#1.csv};
+ \addlegendentry{KenLM}
+}
 \begin{document}
-\begin{frame}{Быстрый языковой prior улучшает ввод в спеллере}
-\vspace{-.2cm}
-{\scriptsize М. А. Барабанщиков \hfill Руководитель: А. И. Майсурадзе}\par
-\vspace{.1cm}
-{\footnotesize \textbf{Спеллер} выбирает буквы экранной клавиатуры по реакции на стимулы.\newline
-\textbf{Меняем только источник:} вероятность следующей буквы по предыдущему тексту.}
-\begin{center}
-\vspace{-.08cm}
-\includegraphics[width=\linewidth,height=4.1cm,keepaspectratio]{../paper/figures/native_main.pdf}
-\end{center}
-\vspace{-.2cm}
-{\small\textbf{KenLM: CER \BaseCER\% $\rightarrow$ \KenCER\% --- на \KenRel\% меньше ошибок.}}\par
-\vspace{.1cm}
-{\scriptsize $q(c)\propto p_M(c\mid h)\,P(E\mid c)$; $h$ --- набранный текст, $E$ --- наблюдения.\newline
-40 новых фраз $\times$ 5 seed $\times$ 3 режима = 600 сессий; физиология эмулирована.\newline
-CER --- число правок / длина эталона. Посткоррекция выключена.}
+
+\begin{frame}[t]{Контекст помогает выбирать буквы по ЭЭГ}
+\subtext{ЭЭГ-спеллер: пользователь смотрит на букву, а система распознаёт реакцию на её подсветку}
+\vspace{4mm}
+{\color{blue}\bfseries\fontsize{14}{17}\selectfont
+Оценка ЭЭГ $\times$ вероятность по тексту $\rightarrow$ выбор буквы\par}
+\vspace{4mm}
+{\bfseries Одна и та же запись ЭЭГ --- три варианта языкового источника\par}
+\vspace{3mm}
+{\fontsize{9}{11}\selectfont\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}p{3.0cm}p{5.0cm}p{5.9cm}@{}}
+\toprule
+\textbf{Источник} & \textbf{Что учитывает} & \textbf{Как влияет на выбор}\\
+\midrule
+Равномерный & Текст не учитывается & Все символы равновероятны\\
+Char4 & До трёх предыдущих символов & Частоты сочетаний букв\\
+KenLM + Char4 & Предыдущие слова и начало слова & Словный и символьный контекст\\
+\bottomrule
+\end{tabular}\par}
+\vspace{4mm}
+\takeaway{Цель: меньше ошибок и меньше стимуляции при вводе по одной букве}
+\vspace{3mm}
+\vfill
+\smalltext{Барабанщиков М. А.\quad Научный руководитель: Майсурадзе А. И.}
+
+\note{Ориентир: 50–60 секунд.
+
+Спеллер — это экранная клавиатура для ввода без движения рук. Пользователь смотрит на нужную букву, строки и столбцы мигают, а декодер оценивает реакцию мозга. Сигнал бывает неоднозначным. Языковая модель добавляет информацию о том, какая буква вероятна по уже набранному тексту. Мы сравниваем три источника на одинаковых наблюдениях: равномерный, символьную четырёхграммную модель и KenLM в смеси с Char4. Последняя использует слова и начало текущего слова. Мы сохраняем посимвольный выбор и отключаем посткоррекцию, чтобы измерить именно вклад быстрого источника.
+
+Источник: пользовательский архив SpellerM1P.zip, main.tex, разделы введения, постановки и метода.
+
+Метод Байеса: Speier et al. 2012, doi:10.1088/1741-2560/9/1/016004.
+
+KenLM: Heafield 2011, https://aclanthology.org/W11-2123/}
 \end{frame}
+
+\begin{frame}[t]{На синтетике KenLM снижает ошибку текста на 37,75\%}
+\subtext{40 фраз $\cdot$ 1\,406 символов $\cdot$ 5 прогонов на фразу $\cdot$ одинаковые наблюдения для всех источников}
+\vspace{3mm}
+\begin{columns}[T,onlytextwidth]
+\begin{column}{.49\textwidth}
+\centering
+\begin{tikzpicture}
+\begin{axis}[deckaxis,title={Верно выбранные символы, \%},xmin=.6,xmax=5.4,xtick={1,3,5}]
+\curves{simulation}
+\end{axis}
+\end{tikzpicture}\par
+\vspace{1mm}
+\smalltext{Циклов на символ; правильное начало фразы}
+\end{column}
+\begin{column}{.49\textwidth}
+\centering
+\begin{tikzpicture}
+\begin{axis}[deckaxis,title={Ошибка текста CER, \%},ybar,bar width=12mm,bar shift=0pt,unbounded coords=discard,
+ ymin=0,ymax=25,ytick={0,5,10,15,20,25},xmin=.5,xmax=3.5,
+ xtick={1,2,3},xticklabels={Без языка,Char4,KenLM},xlabel={},
+ nodes near coords,point meta=y,
+ every node near coord/.append style={font=\fontsize{9}{10}\selectfont\bfseries,text=ink,/pgf/number format/fixed,/pgf/number format/precision=2,/pgf/number format/fixed zerofill,/pgf/number format/use comma},
+ enlarge x limits=false]
+\addplot[fill=gray,draw=none,restrict x to domain=1:1] table[x=index,y=cer,col sep=comma]{figures/cer.csv};
+\addplot[fill=blue,draw=none,restrict x to domain=2:2] table[x=index,y=cer,col sep=comma]{figures/cer.csv};
+\addplot[fill=green,draw=none,restrict x to domain=3:3] table[x=index,y=cer,col sep=comma]{figures/cer.csv};
+\end{axis}
+\end{tikzpicture}\par
+\vspace{4mm}
+\smalltext{Контекст: собственный текст $\cdot$ 5 циклов}
+\vspace{1mm}
+\end{column}
+\end{columns}
+\vspace{3mm}
+\takeaway{CER --- доля исправлений: 19,10\% $\rightarrow$ 12,67\% (Char4) $\rightarrow$ 11,89\% (KenLM)}
+\vfill
+
+\note{Ориентир: 55–65 секунд.
+
+Сначала сравнение проведено в имитации на сорока русских фразах. Левый график отвечает на вопрос, насколько точно выбирается очередная буква при правильном предыдущем тексте. При пяти циклах базовый вариант даёт около 81 процента, Char4 — 92, KenLM — 93. Правый график ближе к последовательному вводу: модель видит собственный текст, включая ошибки. CER — это количество вставок, удалений и замен, необходимых для восстановления эталона, делённое на его длину. Для равномерного источника ошибка составляет 19,10 процента, для Char4 — 12,67, для KenLM — 11,89. KenLM уменьшает её на 37,75 процента относительно базового режима. Интервалы показывают вариативность по фразам; здесь не заявляется статистически доказанное превосходство KenLM над Char4.
+
+Источник: SpellerM1P.zip, рисунок native\_main.pdf и таблица имитационного сравнения. Точные данные: code/results/native/summary.json ранее выполненного эксперимента; совпадение исходного рисунка с архивом проверено. 95\% интервалы перечислены в порядке Без языка, Char4, KenLM. Интервалы показаны текстом вместо отрезков, чтобы сохранить редактируемые диаграммы.
+
+Прирост 37,75\% — относительное уменьшение CER, не процентные пункты. Имитация не является записью реальной ЭЭГ.}
+\end{frame}
+
+\begin{frame}[t]{На реальной ЭЭГ: 57 из 57 символов по пяти циклам}
+\subtext{NVX136 $\cdot$ один участник $\cdot$ 57 символов $\cdot$ в реальном времени $\cdot$ без дообучения и посткоррекции}
+\vspace{2mm}
+\takeaway{При 5 циклах: без языка --- 54/57; Char4 и KenLM --- 57/57}
+\vspace{3mm}
+\begin{columns}[T,onlytextwidth]
+\begin{column}{.49\textwidth}
+\centering
+\begin{tikzpicture}
+\begin{axis}[deckaxis,title={xDAWN + LDA $\cdot$ точность, \%},height=3.2cm,xmin=.7,xmax=7.3,xtick={1,2,3,4,5,6,7}]
+\curves{xlda}
+\end{axis}
+\end{tikzpicture}\par
+\smalltext{Циклов на символ}
+\end{column}
+\begin{column}{.49\textwidth}
+\centering
+\begin{tikzpicture}
+\begin{axis}[deckaxis,title={EEGNet $\cdot$ точность, \%},height=3.2cm,xmin=.7,xmax=7.3,xtick={1,2,3,4,5,6,7}]
+\curves{eegnet}
+\end{axis}
+\end{tikzpicture}\par
+\smalltext{Циклов на символ}
+\end{column}
+\end{columns}
+\vspace{3mm}
+{\color{blue}\bfseries\fontsize{11}{13}\selectfont
+Стимуляция, 7 $\rightarrow$ 5 циклов: 22,17 $\rightarrow$ 15,83 с на символ ($-28{,}6\%$)\par}
+\vspace{2mm}
+\vfill
+\end{frame}
+
 \end{document}
